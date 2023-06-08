@@ -133,8 +133,58 @@ function ConversationCard(props) {
 
   useEffect(() => {
     const listener = (msg) => {
-      const answer = JSON.parse(msg.answer?.replace(/'/g, '"'))
-      if (answer.program) {
+      let answer = {}
+      if (msg.answer) answer = JSON.parse(msg.answer?.replace(/'/g, '"'))
+
+      if (answer?.program) {
+        /**
+         * Tab and Page Manage - Open, Search, Close, Next/Previous Page, Scroll
+         */
+        const search = answer?.content
+        let page = 0
+        const currentUrl = window.location.href
+
+        switch (answer.program) {
+          case 'open_tab':
+            window.open('https://google.com/search?q=', '_blank', 'noreferrer')
+            break
+          case 'open_tab_search':
+            window.open('https://google.com/search?q=' + search, '_blank', 'noreferrer')
+            break
+          case 'close_tab':
+            //window.focus()
+            window.close()
+            break
+          case 'previous_page':
+            if (page === 0) {
+              page = 0
+            } else {
+              page -= 10
+            }
+
+            window.location.assign(currentUrl + '&start=' + page)
+            break
+          case 'next_page':
+            page += 10
+
+            window.location.assign(currentUrl + '&start=' + page)
+            break
+          case 'scroll_up':
+            window.scrollBy(0, -300)
+            break
+          case 'scroll_down':
+            window.scrollBy(0, 300)
+            break
+          case 'scroll_top':
+            window.scrollTo(0, 0)
+            break
+          case 'scroll_bottom':
+            window.scrollTo(0, document.body.scrollHeight)
+            break
+          default:
+            break
+        }
+
         updateAnswer(answer.program, false, 'answer')
       }
 
@@ -146,17 +196,6 @@ function ConversationCard(props) {
       if (msg.done) {
         updateAnswer('', true, 'answer', true)
         setIsReady(true)
-      }
-
-      /**
-       * Tab Manage - Open, Search, Close
-       */
-      if (answer?.program === 'open_tab' || answer?.program === 'open_tab_search') {
-        const search = answer?.content
-
-        window.open('https://google.com/search?q=' + search, '_blank', 'noreferrer')
-      } else if (answer?.program === 'close_tab') {
-        window.close()
       }
 
       if (msg.error) {
@@ -406,6 +445,7 @@ function ConversationCard(props) {
         port={port}
         reverseResizeDir={props.pageMode}
         onSubmit={(question) => {
+          console.log('new quetion------------->', question)
           const newQuestion = new ConversationItemData('question', question)
           const newAnswer = new ConversationItemData(
             'answer',
