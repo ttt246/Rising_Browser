@@ -141,14 +141,14 @@ function ConversationCard(props) {
          * Tab and Page Manage - Open, Search, Close, Next/Previous Page, Scroll
          */
         const search = answer?.content
+        let page = 0
+        const currentUrl = window.location.href
 
         switch (answer.program) {
           case 'open_tab':
-            //window.focus()
             window.open('https://google.com/search?q=', '_blank', 'noreferrer')
             break
           case 'open_tab_search':
-            //window.focus()
             window.open('https://google.com/search?q=' + search, '_blank', 'noreferrer')
             break
           case 'close_tab':
@@ -156,16 +156,24 @@ function ConversationCard(props) {
             window.close()
             break
           case 'previous_page':
-            window.history.back()
+            if (page === 0) {
+              page = 0
+            } else {
+              page -= 10
+            }
+
+            window.location.assign(currentUrl + '&start=' + page)
             break
           case 'next_page':
-            window.history.forward()
+            page += 10
+
+            window.location.assign(currentUrl + '&start=' + page)
             break
           case 'scroll_up':
-            window.scrollBy(0, -100)
+            window.scrollBy(0, -300)
             break
           case 'scroll_down':
-            window.scrollBy(0, 100)
+            window.scrollBy(0, 300)
             break
           case 'scroll_top':
             window.scrollTo(0, 0)
