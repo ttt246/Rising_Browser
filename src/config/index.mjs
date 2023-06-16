@@ -73,8 +73,9 @@ export const defaultConfig = {
   /** @type {keyof ModelMode}*/
   modelMode: 'balanced',
 
-  customModelApiUrl: 'https://smartphone.herokuapp.com/sendNotification',
-  risingApiUrlForChat: 'https://smartphone.herokuapp.com/chat_rising',
+  customModelApiUrl: 'https://ttt246-brain.hf.space/sendNotification',
+  selectItemApiUrl: 'https://ttt246-brain.hf.space/browser/item',
+  risingApiUrlForChat: 'https://ttt246-brain.hf.space/chat_rising',
 
   // advanced
 

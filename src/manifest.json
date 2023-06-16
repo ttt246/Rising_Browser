@@ -20,7 +20,8 @@
     "storage",
     "contextMenus",
     "unlimitedStorage",
-    "tabs"
+    "tabs",
+    "activeTab"
   ],
   "optional_permissions": [
     "background"

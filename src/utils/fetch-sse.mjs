@@ -55,10 +55,12 @@ export async function fetchForBrowserMng(resource, options) {
   let hasStarted = false
   for await (const chunk of streamAsyncIterable(resp.body)) {
     const str = new TextDecoder().decode(chunk)
+    console.log('response data -------->', str)
     if (!str.startsWith('{') && !str.startsWith('"{')) {
       parser.feed(str)
     } else {
-      const result = JSON.parse(str).result
+      const result = JSON.stringify(JSON.parse(str).result)
+      console.log('response_result---->', result)
       const formattedStr = 'data: ' + result + '\n\ndata: [DONE]\n\n'
       parser.feed(formattedStr)
     }

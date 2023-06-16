@@ -5,12 +5,27 @@ import { openUrl } from '../utils/open-url'
 import { registerPortListener } from '../services/wrappers.mjs'
 import { refreshMenu } from './menus.mjs'
 import { registerCommands } from './commands.mjs'
-import { getManagementBrowser } from '../services/apis/rising-api.mjs'
+import { getItemToSelect, getManagementBrowser } from '../services/apis/rising-api.mjs'
 
 async function executeApi(session, port, config) {
   // ### the part for integrating with backend ###
   console.debug('config', config)
-  await getManagementBrowser(port, session.question, session, '')
+
+  console.log('browser-type--->', session.type)
+
+  if (session.type === undefined || session.type === null) {
+    await getManagementBrowser(port, session.question, session, '')
+    return
+  }
+
+  switch (session.type) {
+    case 'select_item':
+      await getItemToSelect(port, session.question, session.links, session, '')
+      break
+    default:
+      await getManagementBrowser(port, session.question, session, '')
+      break
+  }
 }
 
 Browser.runtime.onMessage.addListener(async (message, sender) => {
