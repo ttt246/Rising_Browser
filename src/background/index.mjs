@@ -7,12 +7,8 @@ import { refreshMenu } from './menus.mjs'
 import { registerCommands } from './commands.mjs'
 import { getItemToSelect, getManagementBrowser } from '../services/apis/rising-api.mjs'
 
-async function executeApi(session, port, config) {
+async function executeApi(session, port) {
   // ### the part for integrating with backend ###
-  console.debug('config', config)
-
-  console.log('browser-type--->', session.type)
-
   if (session.type === undefined || session.type === null) {
     await getManagementBrowser(port, session.question, session, '')
     return
@@ -87,6 +83,6 @@ Browser.runtime.onMessage.addListener(async (message, sender) => {
   }
 })
 
-registerPortListener(async (session, port, config) => await executeApi(session, port, config))
+registerPortListener(async (session, port) => await executeApi(session, port))
 registerCommands()
 refreshMenu()

@@ -191,7 +191,6 @@ function ConversationCard(props) {
           case 'select_item_detail_info':
             // eslint-disable-next-line no-case-declarations
             const links = scrapeATags()
-            console.log('scrap_links----->', links)
 
             try {
               let question = selectItemprompt
@@ -489,7 +488,6 @@ function ConversationCard(props) {
         port={port}
         reverseResizeDir={props.pageMode}
         onSubmit={(question) => {
-          console.log('new quetion------------->', question)
           const newQuestion = new ConversationItemData('question', question)
           const newAnswer = new ConversationItemData(
             'answer',

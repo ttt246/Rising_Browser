@@ -48,10 +48,8 @@ export async function generateAnswersWithCustomApi(port, question, session, apiK
       user_input: question,
     }),
     onMessage(message) {
-      console.debug('sse message', message)
       if (message === '[DONE]') {
         pushRecord(session, question, answer)
-        console.debug('conversation history', { content: session.conversationRecords })
         port.postMessage({ answer: null, done: true, session: session })
         return
       }
@@ -99,10 +97,8 @@ export async function getManagementBrowser(port, question, session, apiKey) {
       message: question,
     }),
     onMessage(message) {
-      console.debug('sse message', message)
       if (message === '[DONE]') {
         pushRecord(session, question, answer)
-        console.debug('conversation history', { content: session.conversationRecords })
         port.postMessage({ answer: null, done: true, session: session })
         return
       }
@@ -130,9 +126,6 @@ export async function getItemToSelect(port, question, links, session, apiKey) {
   const config = await getUserConfig()
   const apiUrl = config.selectItemApiUrl
 
-  console.log('select_item_question ---->', question)
-  console.log('select_item_links ---->', links)
-
   let answer = ''
   await fetchForBrowserMng(apiUrl, {
     method: 'POST',
@@ -148,10 +141,8 @@ export async function getItemToSelect(port, question, links, session, apiKey) {
       prompt: question,
     }),
     onMessage(message) {
-      console.debug('sse message', message)
       if (message === '[DONE]') {
         pushRecord(session, question, answer)
-        console.debug('conversation history', { content: session.conversationRecords })
         port.postMessage({ answer: null, done: true, session: session })
         return
       }
