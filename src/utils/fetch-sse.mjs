@@ -58,7 +58,7 @@ export async function fetchForBrowserMng(resource, options) {
     if (!str.startsWith('{') && !str.startsWith('"{')) {
       parser.feed(str)
     } else {
-      const result = JSON.parse(str).result
+      const result = JSON.stringify(JSON.parse(str).result)
       const formattedStr = 'data: ' + result + '\n\ndata: [DONE]\n\n'
       parser.feed(formattedStr)
     }

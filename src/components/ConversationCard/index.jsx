@@ -20,6 +20,7 @@ import { initSession } from '../../services/init-session.mjs'
 import { findLastIndex } from 'lodash-es'
 
 const logo = Browser.runtime.getURL('logo1.png')
+let selectItemprompt = ''
 
 class ConversationItemData extends Object {
   /**
@@ -134,7 +135,7 @@ function ConversationCard(props) {
   useEffect(() => {
     const listener = (msg) => {
       let answer = {}
-      if (msg.answer) answer = JSON.parse(msg.answer?.replace(/'/g, '"'))
+      if (msg.answer) answer = JSON.parse(msg.answer)
 
       if (answer?.program) {
         /**
@@ -181,12 +182,36 @@ function ConversationCard(props) {
           case 'scroll_bottom':
             window.scrollTo(0, document.body.scrollHeight)
             break
+          case 'message':
+            updateAnswer(answer.content, false, 'answer')
+            break
+          case 'browser':
+            window.open(answer.content, '_blank', 'noreferrer')
+            break
+          case 'select_item_detail_info':
+            // eslint-disable-next-line no-case-declarations
+            const links = scrapeATags()
+
+            try {
+              let question = selectItemprompt
+              const type = 'select_item'
+              const newSession = { ...session, question, links, type, isRetry: false }
+              setSession(newSession)
+              port.postMessage({ session: newSession })
+            } catch (e) {
+              updateAnswer(e, false, 'error')
+            }
+            break
+          case 'select_item':
+            updateAnswer(answer.content, false, 'answer')
+            window.open(answer.content, '_blank', 'noreferrer')
+            break
           default:
             break
         }
-
-        updateAnswer(answer.program, false, 'answer')
       }
+
+      if ('message' !== answer.program) updateAnswer(answer.program, false, 'answer')
 
       if (msg.session) {
         if (msg.done) msg.session = { ...msg.session, isRetry: false }
@@ -256,6 +281,24 @@ function ConversationCard(props) {
     } catch (e) {
       updateAnswer(e, false, 'error')
     }
+  }
+
+  const scrapeATags = () => {
+    const links = []
+
+    const aTags = document.querySelectorAll('a')
+
+    aTags.forEach((aTag) => {
+      const content = aTag.textContent || ''
+      const hrefElement = document.createElement('a')
+
+      hrefElement.href = aTag.getAttribute('href') || ''
+      const href = hrefElement.href
+
+      links.push({ title: content, link: href })
+    })
+
+    return links
   }
 
   return (
@@ -445,7 +488,6 @@ function ConversationCard(props) {
         port={port}
         reverseResizeDir={props.pageMode}
         onSubmit={(question) => {
-          console.log('new quetion------------->', question)
           const newQuestion = new ConversationItemData('question', question)
           const newAnswer = new ConversationItemData(
             'answer',
@@ -454,7 +496,9 @@ function ConversationCard(props) {
           setConversationItemData([...conversationItemData, newQuestion, newAnswer])
           setIsReady(false)
 
-          const newSession = { ...session, question, isRetry: false }
+          selectItemprompt = question
+          let type = 'browser'
+          const newSession = { ...session, question, type, isRetry: false }
           setSession(newSession)
           try {
             port.postMessage({ session: newSession })
